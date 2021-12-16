@@ -1,4 +1,7 @@
 const Model = require('../models/base_model');
+const AllTransactions = require('../models/allTransactions')
+const Balances = require('../models/balances')
+const AliveBalances = require('../models/aliveBalances')
 
 describe('Models:', () => {
 
@@ -7,13 +10,16 @@ describe('Models:', () => {
       return;
     }
   }
+  const queries = {
+
+  }
 
   describe('Base model class', () => {
     beforeEach(() => {
       jest.resetAllMocks();
     })
 
-    test('constructor()', () => {
+    describe('constructor()', () => {
       test('Should take a connection and queries argument and assign them to this.connection and this.queries', () => {
 //TODO:
       })
@@ -39,8 +45,52 @@ describe('Models:', () => {
         expect(result instanceof Promise).toBe(true);
       })
 
-      test('Should take two potential arguments and pass them to connection.query()')
+      test('Should take two potential arguments and pass them to connection.query()', () => {
 //TODO:
+      })
     })
   })
+
+  describe('AllTransactions Model:', () => {
+    beforeEach(() => {
+      jest.resetAllMocks();
+    })
+
+    test('Should have a properties "connection" and "queries"', () => {
+      const newAllTransactions = new AllTransactions('connection', 'queries');
+      expect(newAllTransactions.connection).toBe('connection')
+      expect(newAllTransactions.queries).toBe('queries')
+    })
+
+  })
+
+  describe('Balances Model:', () =>{
+    beforeEach(() => {
+      jest.resetAllMocks();
+    })
+
+
+    test('Should have a properties "connection" and "queries"', () => {
+      const newBalances = new Balances('connection', 'queries');
+      expect(newBalances.connection).toBe('connection')
+      expect(newBalances.queries).toBe('queries')
+    })
+
+  })
+  describe('AliveBalances Model:', () => {
+    beforeEach(() => {
+      jest.resetAllMocks();
+    })
+
+
+    test('Should have a properties "connection" and "queries"', () => {
+      const newAliveBalances = new AliveBalances('connection', 'queries');
+      expect(newAliveBalances.connection).toBe('connection')
+      expect(newAliveBalances.queries).toBe('queries')
+    })
+
+  })
+
 })
+
+
