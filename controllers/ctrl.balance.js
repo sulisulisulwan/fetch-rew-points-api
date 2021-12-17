@@ -1,8 +1,8 @@
-const Controller = require('./controller_base_class');
+const Controller = require('./base_class/controller');
 
 class Balance extends Controller {
-  constructor(models, utils) {
-    super(models, utils);
+  constructor(models) {
+    super(models);
   }
 
   async getBalance () {

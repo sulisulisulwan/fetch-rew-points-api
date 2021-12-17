@@ -1,4 +1,4 @@
 module.exports = {
-  balances: require('./balances'),
-  transactions: require('./transactions')
+  balances: require('./rt.balances'),
+  transactions: require('./rt.transactions')
 }

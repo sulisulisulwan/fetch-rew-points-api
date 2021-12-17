@@ -1,4 +1,4 @@
-const Model = require('./model_base_class')
+const Model = require('./base_class/model')
 
 class Transactions extends Model {
   constructor(connection, queries) {

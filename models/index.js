@@ -1,6 +1,6 @@
 const connection = require('../db')
-const BalancesModel = require('./balances');
-const TransactionsModel = require('./transactions');
+const BalancesModel = require('./mdl.balances');
+const TransactionsModel = require('./mdl.transactions');
 const BalancesQueries = require('./queries/balances')
 const TransactionsQueries = require('./queries/transactions')
 
