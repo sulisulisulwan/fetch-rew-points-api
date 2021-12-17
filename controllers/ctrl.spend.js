@@ -1,11 +1,14 @@
 const  { getPositiveSubBalances, updateAndInsertTransactions } = require('../models').TransactionsModel;
 const  { updatePayerBalances } = require('../models').BalancesModel;
-
+const { processSpendPoints } = require('./subroutines/sr.debit')
 const spendPoints = async (req, res) => {
-  //calls processDebit, which is now middleware
-
-  //make model calls here, send to middleware
-  //sends back
+  try {
+    const { points } = req.body;
+    const debitSummaryPerPayer = await processSpendPoints(points)
+    res.status(201).json(debitSummaryPerPayer);
+  } catch(err) {
+    res.sendStatus(500);
+  }
 }
 
 module.exports = { spendPoints };
