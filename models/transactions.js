@@ -1,8 +1,8 @@
 const Model = require('./model_base_class')
 
 class Transactions extends Model {
-  constructor(connection, queries, utils) {
-    super(connection, queries, utils);
+  constructor(connection, queries) {
+    super(connection, queries);
   }
 
   async getAllTransactions () {

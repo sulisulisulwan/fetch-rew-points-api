@@ -1,8 +1,8 @@
 const Model = require('./model_base_class')
 
 class Balances extends Model {
-  constructor(connection, queries, utils) {
-    super(connection, queries, utils);
+  constructor(connection, queries) {
+    super(connection, queries);
   }
 
   async getPayerByName (payer) {
@@ -17,15 +17,9 @@ class Balances extends Model {
     return this.query(q, v)
   }
 
-  async updatePayerBalance (newBalance, earliestTransactionId) {
-    const q = earliestTransactionId === null ? this.queries.updatePayerBalance
-      : this.queries.updatePayerBalanceAndEarliestTrans;
-    //possibly instead above have a function which generates the query depending on
-    //values passed in
-    const v = { balance: newBalance };
-    if (earliestTransactionId !== null) {
-      v.earliestTrans = earliestTransactionId
-    }
+  async updatePayerBalances (newBalances) {
+    const q = await this.queries.buildUpdatePayerBalanceQuery(newBalances);
+    const v; //THIS NEEDS TO BE ALL OF THE BALANCES
     return this.query(q, v);
   }
 
