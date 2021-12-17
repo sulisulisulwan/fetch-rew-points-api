@@ -1,7 +1,6 @@
-const Model = require('../models/base_model');
-const AllTransactions = require('../models/allTransactions')
+const Model = require('../models/model_base_class');
+const Transactions = require('../models/transactions')
 const Balances = require('../models/balances')
-const AliveBalances = require('../models/aliveBalances')
 
 describe('Models:', () => {
 
@@ -51,7 +50,7 @@ describe('Models:', () => {
     })
   })
 
-  describe('AllTransactions Model:', () => {
+  describe('Transactions Model:', () => {
     beforeEach(() => {
       jest.resetAllMocks();
     })
@@ -77,20 +76,6 @@ describe('Models:', () => {
     })
 
   })
-  describe('AliveBalances Model:', () => {
-    beforeEach(() => {
-      jest.resetAllMocks();
-    })
-
-
-    test('Should have a properties "connection" and "queries"', () => {
-      const newAliveBalances = new AliveBalances('connection', 'queries');
-      expect(newAliveBalances.connection).toBe('connection')
-      expect(newAliveBalances.queries).toBe('queries')
-    })
-
-  })
-
 })
 
 

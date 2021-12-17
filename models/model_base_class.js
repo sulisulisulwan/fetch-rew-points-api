@@ -1,7 +1,8 @@
 class Model {
-  constructor(connection, queries) {
+  constructor(connection, queries, utils) {
     this.connection = connection;
     this.queries = queries;
+    this.utils = utils;
   }
 
   async query() {
