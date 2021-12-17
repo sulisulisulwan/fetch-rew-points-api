@@ -1,30 +1,38 @@
-const Model = require('./base_class/model')
 
-class Transactions extends Model {
-  constructor(connection, queries) {
-    super(connection, queries);
-  }
+const transactionQueries = require('./queries/transactions')
+const connection = require('../db')
 
-  async getAllTransactions () {
-    const q = this.queries.getAllTransactions;
-    return this.query(q);
-  }
-
-  async getPositiveSubBalances () {
-    const q = this.queries.getPositiveSubBalances;
-    return this.query(q);
-  }
-
-  async addNewTransaction (payer, points, timestamp) {
-    const q = this.queries.addNewTransaction;
-    const v = { payer, points, timestamp }
-    return this.query(q, v)
-  }
-
-  async updateAndInsertTransactions (update, insert) {
-    const q = this.queries.buildUpdateAndInsertMultiQuery(update, insert);
-    // WHAT DO I DO HERE?
-  }
+const getAllTransactions = async () => {
+  const q = transactionQueries.getAllTransactions;
+  const result = await connection.query(q);
+  return result[0];
 }
 
-module.exports = Transactions;
+const getPositiveSubBalances = async  () => {
+  const q = transactionQueries.getPositiveSubBalances;
+  const result = await connection.query(q);
+  return result[0];
+}
+
+const addNewTransaction = async  (transaction) => {
+  const q = transactionQueries.addNewTransaction;
+  const v = transaction;
+  const result = await connection.query(q, v);
+  return result[0];
+}
+
+const updateAndInsertTransactions = async  (update, insert) => {
+  const q = await transactionQueries.buildUpdateAndInsertMultiQuery(update, insert);
+  //update is an array of [transactionId, newBalance, ...]
+  //insert is an array of [payer, balanceTrend,'debit', ...]
+  const v = update.concat(insert);
+  const result = await connection.query(q, v);
+  return result[0];
+}
+
+module.exports = {
+  getAllTransactions,
+  getPositiveSubBalances,
+  addNewTransaction,
+  updateAndInsertTransactions
+};

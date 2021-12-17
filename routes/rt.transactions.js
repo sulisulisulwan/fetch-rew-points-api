@@ -1,10 +1,7 @@
 const router = require('express').Router();
-const { CreditController, SpendController } = require('../controllers')
-const { spendPoints } = SpendController;
-const { creditAccount } = CreditController;
+const { TransactionsController } = require('../controllers')
+const { processTransactions } = TransactionsController;
 
-router.post('/credit', creditAccount)
-router.post('/spend', spendPoints)
-
+router.post('/', processTransactions)
 
 module.exports = router;

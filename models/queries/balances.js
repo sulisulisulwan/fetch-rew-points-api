@@ -1,14 +1,22 @@
 module.exports = {
-  addNewPayer: '',
-  buildUpdatePayerBalanceQuery: async(updatedEarliestTransId) => {
-    if (updatedEarliestTransId === null) {
-      //if earliestTransactionId is null, it means that
-      //we do not want to update earliestTransactionId in the payer Row
-      //build a query that just updates PayerBalance
-    } else {
-      //we have an updatedEarliestTransactionId
-      //so build a query that updates both payer balance
-      //and earliestTransactionId
+  getPayerByName: 'SELECT * FROM Balances WHERE payer = ?',
+  addNewPayer: 'INSERT INTO Balances SET ?;',
+  getAllBalances: 'SELECT * FROM Balances',
+  buildUpdatePayerBalanceQuery: async(newBalances, transType) =>  {
+    const creditQuery = `
+      UPDATE Balances
+      SET balance = ?
+      WHERE id = ?;
+    `;
+    const debitQuery = `
+      UPDATE Balances AS a
+      INNER JOIN Balances AS b ON a.id = b.id
+      SET a.balance = (a.balance + ?) WHERE a.id = ?;
+    `;
+    let multiQuery = ''
+    for (let i = 0; i < newBalances.length; i += 2) {
+      multiQuery += (transType === 'credit' ? creditQuery : debitQuery);
     }
-   }
+    return multiQuery;
+  },
 }

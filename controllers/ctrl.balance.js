@@ -1,13 +1,8 @@
-const Controller = require('./base_class/controller');
+const { getAllBalances } = require('../models').BalancesModel
 
-class Balance extends Controller {
-  constructor(models) {
-    super(models);
-  }
-
-  async getBalance () {
+const getBalance = async (req, res) => {
     try {
-      const balances = await this.models.getAllBalances();
+      const balances = await getAllBalances();
       res.status(200).json(balances);
     } catch(err) {
       console.error(err);
@@ -15,7 +10,4 @@ class Balance extends Controller {
     }
   }
 
-
-}
-
-module.exports = Balance;
+module.exports = { getBalance };

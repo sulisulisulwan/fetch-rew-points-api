@@ -1,32 +1,37 @@
-const Model = require('./base_class/model')
+const balanceQueries = require('./queries/balances')
+const connection= require('../db')
 
-class Balances extends Model {
-  constructor(connection, queries) {
-    super(connection, queries);
-  }
 
-  async getPayerByName (payer) {
-    //the return value of this includes
-    //timestamp and balance data from aliveBalances
-    const q = this.queries.getPayerByName;
-    return this.query(q, payer);
-  }
-  async addNewPayer (payer, points, transactionId) {
-    const q = this.queries.addNewPayer;
-    const v = { payer, points, earliestAliveId }
-    return this.query(q, v)
-  }
-
-  async updatePayerBalances (newBalances) {
-    const q = await this.queries.buildUpdatePayerBalanceQuery(newBalances);
-    const v; //THIS NEEDS TO BE ALL OF THE BALANCES
-    return this.query(q, v);
-  }
-
-  async getAllBalances () {
-    const q = this.queries.getAllBalances;
-    return this.query(q);
-  }
+const getPayerByName = async (payer) => {
+  //the return value of this includes
+  //timestamp and balance data from aliveBalances
+  const q = balanceQueries.getPayerByName;
+  const result = await connection.query(q, payer);
+  return result[0];
+}
+const addNewPayer = async (payer, points) => {
+  const q = balanceQueries.addNewPayer;
+  const v = { payer, balance: points }
+  const result = await connection.query(q, v)
+  return result[0].insertId;
 }
 
-module.exports = Balances;
+const updatePayerBalances = async (newBalances, transType) => {
+
+  const q = await balanceQueries.buildUpdatePayerBalanceQuery(newBalances, transType);
+  const result = await connection.query(q, newBalances);
+  return result;
+}
+
+const getAllBalances = async () => {
+  const q = balanceQueries.getAllBalances;
+  const result = connection.query(q);
+  return result[0]
+}
+
+module.exports = {
+  getPayerByName,
+  addNewPayer,
+  updatePayerBalances,
+  getAllBalances
+};
