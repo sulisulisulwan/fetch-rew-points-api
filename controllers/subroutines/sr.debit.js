@@ -22,15 +22,22 @@ const distributeDebit = async (subBalances, points) => {
     let processedSubBalances = [];
     while (debit > 0 && subBalances[i] !== undefined) {
       let { id, payer, subBalance, balanceId } = subBalances[i];
-      let difference = Math.abs(debit - subBalance);
-      let newSubBalance = difference > 0 ? 0 : subBalance - difference;
-      let newDebit = subBalance < 0 ? debit + difference : debit - difference;
 
-      processedSubBalances.push(newSubBalance, id)
+      let difference = Math.abs(debit - subBalance);
+      let newSubBalance = subBalance < debit ? 0 : subBalance - debit;
+      debit = debit <= subBalance ? 0 : difference;
+
+      let pointsUpdate = subBalance < debit ? subBalance * -1 : (subBalance - difference) * -1;
+
+      //FOR THE DATABASE
+      processedSubBalances.push(newSubBalance, id);
+
+
       totalPayerDebits[payer] === undefined ?
-        totalPayerDebits[payer] = { payer, balanceId, points: subBalance}
-        : totalPayerDebits[payer].points = totalPayerDebits[payer].points + subBalance;
+        totalPayerDebits[payer] = { payer, balanceId, points: pointsUpdate}
+        : totalPayerDebits[payer].points = totalPayerDebits[payer].points - (pointsUpdate * -1);
       i += 1;
+
     }
     return [totalPayerDebits, processedSubBalances];
   } catch(err) {
@@ -46,7 +53,11 @@ const formatDebitData = async (totalPayerDebits) => {
     const payerBalanceUpdates = []
     for (let payerDebitTotal in totalPayerDebits) {
       const { payer, balanceId, points } = totalPayerDebits[payerDebitTotal]
+
+      //FOR THE RESPONSE
       debitSummaryPerPayer.push({ payer, points });
+
+      //FOR THE DATABASE
       payerBalanceUpdates.push(points, balanceId)
     }
     return [debitSummaryPerPayer, payerBalanceUpdates];
@@ -60,9 +71,16 @@ const processSpendPoints = async (points) => {
   try {
     //grab all transactions in order by timestamp a
     const allTransactionsWithNonZero = await getAllNonZeroSubBalanceTransactions();
-    const [totalPayerDebits, processedSubBalances] = await distributeDebit();
+    const [totalPayerDebits, processedSubBalances] = await distributeDebit(allTransactionsWithNonZero, points);
     const [debitSummaryPerPayer, payerBalanceUpdates] = await formatDebitData(totalPayerDebits);
-    //subtract totalPayerDebit from payer Balance
+
+    console.log(`
+
+    FINALLY BEFORE DATABASE INSERTION
+    payerBalanceUpdates: ${payerBalanceUpdates}
+    processedSubBalances: ${processedSubBalances}
+
+    `)
     await updateTransactionsAndBalances(payerBalanceUpdates, processedSubBalances)
     //update transactions with subbalances in processedSubBalances
     return debitSummaryPerPayer;

@@ -27,7 +27,7 @@ const addNewPayer = async (payer, points) => {
 const getAllBalances = async () => {
   try {
     const q = queries.getAllBalances;
-    const result = connection.query(q);
+    const result = await connection.query(q);
     return result[0]
   } catch(err) {
     console.error(err);
