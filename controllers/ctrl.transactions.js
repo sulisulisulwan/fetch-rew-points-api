@@ -7,10 +7,9 @@ const processTransactions = async (req, res) => {
   try {
     const { payer, points } = req.body;
     const timestamp = await formatTimestamp(req.body.timestamp)
-    let payerBalance = await getPayerByName(payer)
-    const balanceId = payerBalance.length === 0 ? await addNewPayer(payer, points) : payerBalance[0].id;
-    payerBalance = payerBalance.length === 0 ? points : payerBalance[0].balance + points;
-    let transactionData = { payer, points, timestamp, balanceId, payerBalance };
+    let payerRecord = await getPayerByName(payer)
+    const payerId = payerRecord.length === 0 ? await addNewPayer(payer) : payerRecord[0].id;
+    let transactionData = { payer, points, timestamp, payerId };
     points < 0 ? await addDebitTransaction(transactionData)
       : await addCreditTransaction(transactionData);
       res.sendStatus(201);

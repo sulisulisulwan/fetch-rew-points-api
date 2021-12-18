@@ -1,14 +1,14 @@
 const { addNewTransaction} = require('../../models').TransactionsModel
 const addCreditTransaction = async (transactionData) => {
   try {
-    let { payer, points, timestamp, balanceId, payerBalance } = transactionData;
+    let { payer, points, timestamp, payerId, payerRecord } = transactionData;
     await addNewTransaction(
       {
         points,
         payer,
         timestamp,
         subBalance: points,
-        balanceId,
+        payerId,
         trans_type: 'credit'
       }
     )

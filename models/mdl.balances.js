@@ -12,10 +12,10 @@ const getPayerByName = async (payer) => {
     return err;
   }
 }
-const addNewPayer = async (payer, points) => {
+const addNewPayer = async (payer) => {
   try {
     const q = queries.addNewPayer;
-    const v = { payer, balance: points }
+    const v = { payer }
     const result = await connection.query(q, v)
     return result[0].insertId;
   } catch(err) {

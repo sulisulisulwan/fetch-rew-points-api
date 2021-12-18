@@ -4,11 +4,9 @@ CREATE DATABASE fetchAPI;
 
 USE fetchAPI;
 
-
-CREATE TABLE Balances (
+CREATE TABLE Payers (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  payer VARCHAR(40) NOT NULL,
-  balance INT NOT NULL
+  payer VARCHAR(40) NOT NULL
 );
 
 CREATE TABLE Transactions (
@@ -18,8 +16,8 @@ CREATE TABLE Transactions (
   timestamp DATETIME,
   subBalance INT,
   trans_type VARCHAR(6),
-  balanceId INT,
-  FOREIGN KEY (balanceId) REFERENCES Balances(id)
+  payerId INT,
+  FOREIGN KEY (payerId) REFERENCES Payers(id)
 );
 
 
