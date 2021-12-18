@@ -2,6 +2,7 @@ const  { getAllNonZeroSubBalanceTransactions, updateTransactionsSubBalances} = r
 const  { addNewTransaction } = require('../../models').TransactionsModel;
 const { formatTimestamp, getTimestampForNow } = require('./../utils')
 
+
 const addDebitTransaction= async (transactionData) => {
   try {
     const { payer, points, timestamp, subBalance, payerId } = transactionData;
@@ -14,6 +15,7 @@ const addDebitTransaction= async (transactionData) => {
   }
 }
 
+//TESTABLE
 const distributeDebit = async (subBalances, points) => {
   try {
     let debit = points;
@@ -31,7 +33,6 @@ const distributeDebit = async (subBalances, points) => {
         totalPayerDebits[payer] = { payer, payerId, points: pointsUpdate}
         : totalPayerDebits[payer].points = totalPayerDebits[payer].points - (pointsUpdate * -1);
       i += 1;
-
     }
     return [totalPayerDebits, processedSubBalances];
   } catch(err) {

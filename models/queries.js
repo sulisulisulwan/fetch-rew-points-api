@@ -8,7 +8,7 @@ module.exports = {
   getAllNonZeroSubBalancedTransactions: 'SELECT * FROM Transactions WHERE subBalance != 0 ORDER BY timestamp;',
   buildMultiStatementQuery: async (queryData) => {
     try {
-      let multiStatementQuery = ''
+      let multiStatementQuery = '';
       for (let i = 0; i < queryData.length; i += 2) {
         const statement = queryData[i]
         const numOfStatements = queryData[i + 1];

@@ -1,7 +1,7 @@
 {
   "name": "fetch-rew-points-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "A webservice that keeps records of client credit/debit transactions",
   "main": "index.js",
   "directories": {
     "test": "tests"

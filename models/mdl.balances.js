@@ -15,8 +15,7 @@ const getPayerByName = async (payer) => {
 const addNewPayer = async (payer) => {
   try {
     const q = queries.addNewPayer;
-    const v = { payer }
-    const result = await connection.query(q, v)
+    const result = await connection.query(q, payer)
     return result[0].insertId;
   } catch(err) {
     console.error(err);
