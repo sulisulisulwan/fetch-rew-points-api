@@ -1,37 +1,42 @@
-const balanceQueries = require('./queries/balances')
+const queries = require('./queries')
 const connection= require('../db')
 
 
 const getPayerByName = async (payer) => {
-  //the return value of this includes
-  //timestamp and balance data from aliveBalances
-  const q = balanceQueries.getPayerByName;
-  const result = await connection.query(q, payer);
-  return result[0];
+  try {
+    const q = queries.getPayerByName;
+    const result = await connection.query(q, payer);
+    return result[0];
+  } catch (err) {
+    console.error(err);
+    return err;
+  }
 }
 const addNewPayer = async (payer, points) => {
-  const q = balanceQueries.addNewPayer;
-  const v = { payer, balance: points }
-  const result = await connection.query(q, v)
-  return result[0].insertId;
-}
-
-const updatePayerBalances = async (newBalances, transType) => {
-
-  const q = await balanceQueries.buildUpdatePayerBalanceQuery(newBalances, transType);
-  const result = await connection.query(q, newBalances);
-  return result;
+  try {
+    const q = queries.addNewPayer;
+    const v = { payer, balance: points }
+    const result = await connection.query(q, v)
+    return result[0].insertId;
+  } catch(err) {
+    console.error(err);
+    return err;
+  }
 }
 
 const getAllBalances = async () => {
-  const q = balanceQueries.getAllBalances;
-  const result = connection.query(q);
-  return result[0]
+  try {
+    const q = queries.getAllBalances;
+    const result = connection.query(q);
+    return result[0]
+  } catch(err) {
+    console.error(err);
+    return err;
+  }
 }
 
 module.exports = {
   getPayerByName,
   addNewPayer,
-  updatePayerBalances,
   getAllBalances
 };

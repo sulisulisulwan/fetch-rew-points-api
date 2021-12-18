@@ -1,23 +1,18 @@
-const { getPayerByName, addNewPayer, updatePayerBalances, } = require('../models').BalancesModel
-const { addNewTransaction} = require('../models').TransactionsModel
-const { creditAccount } = require('./subroutines/sr.credit')
-const { adminDebitAccount } = require('./subroutines/sr.debit')
-
+const { getPayerByName, addNewPayer } = require('../models').BalancesModel
+const { addCreditTransaction } = require('./subroutines/sr.credit')
+const { addDebitTransaction } = require('./subroutines/sr.debit')
+const { formatTimestamp } = require('./utils')
 
 const processTransactions = async (req, res) => {
   try {
     const { payer, points } = req.body;
-    let balanceId;
+    const timestamp = await formatTimestamp(req.body.timestamp)
     let payerBalance = await getPayerByName(payer)
-    if (payerBalance.length === 0) {
-      balanceId = await addNewPayer(payer, points)
-      payerBalance = points;
-    } else {
-      balanceId = payerBalance[0].id;
-    }
+    const balanceId = payerBalance.length === 0 ? await addNewPayer(payer, points) : payerBalance[0].id;
+    payerBalance = payerBalance.length === 0 ? points : payerBalance[0].balance + points;
     let transactionData = { payer, points, timestamp, balanceId, payerBalance };
-    points < 0 ? await adminDebitAccount(transactionData)
-      : await credit(transactionData);
+    points < 0 ? await addDebitTransaction(transactionData)
+      : await addCreditTransaction(transactionData);
       res.sendStatus(201);
   } catch(err) {
     console.error(err)

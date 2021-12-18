@@ -1,38 +1,38 @@
-const  { getPositiveSubBalances, updateAndInsertTransactions } = require('../../models').TransactionsModel;
-const  { updatePayerBalances } = require('../../models').BalancesModel;
-const { getTimestampForNow, formatTimestamp } = require('./../utils')
+const  { getAllNonZeroSubBalanceTransactions, updateTransactionsAndBalances } = require('../../models').SpendModel;
+const  { addNewTransaction } = require('../../models').TransactionsModel;
+const { formatTimestamp, getTimestampForNow } = require('./../utils')
 
-const adminDebitAccount = async (transactionData) => {
-  const { payer, points, timestamp } = transactionData;
-  await updatePayerBalances([-1 * points, balanceId], 'debit')
-  return;
+const addDebitTransaction= async (transactionData) => {
+  try {
+    const { payer, points, timestamp, subBalance, balanceId } = transactionData;
+    const data = { payer, points, timestamp, subBalance: points, trans_type: 'debit', balanceId }
+    await addNewTransaction(data);
+    return;
+  } catch(err) {
+    console.error(err);
+    return err;
+  }
 }
 
 const distributeDebit = async (subBalances, points) => {
   try {
     let debit = points;
-    const processedTransactions = []; //This will be sent to insert into Transactions database
-    const updatedSubBalances = []; //This will be sent to update existing subbalances in transactions
-    const totalDebitsPerPayer = {}; //This will be formatted later to update Balances database and send to client via response
     let i = 0;
-    let timestamp = await formatTimestamp(await getTimestampForNow());
+    let totalPayerDebits = {};
+    let processedSubBalances = [];
     while (debit > 0 && subBalances[i] !== undefined) {
       let { id, payer, subBalance, balanceId } = subBalances[i];
-      let debitForSubBalance = subBalance <= debit ? subBalance : debit;
-      let debitToZero = subBalance <= debit ? false : true;
-      newSubBalance = subBalance <= debit ? 0 : subBalance;
-      subBalance <= debit ? debit -= subBalance : subBalance -= debit
-      if (debitToZero) {
-        debit = 0
-      }
-      processedTransactions.push({ payer, points: debitForSubBalance * -1, trans_type: 'debit', balanceId, timestamp });
-      updatedSubBalances.push(newSubBalance, id);
-      totalDebitsPerPayer[payer] === undefined ?
-        totalDebitsPerPayer[payer] = { payer, balanceId, points: debitForSubBalance * -1}
-        : totalDebitsPerPayer[payer].points = totalDebitsPerPayer[payer].points - debitForSubBalance;
+      let difference = Math.abs(debit - subBalance);
+      let newSubBalance = difference > 0 ? 0 : subBalance - difference;
+      let newDebit = subBalance < 0 ? debit + difference : debit - difference;
+
+      processedSubBalances.push(newSubBalance, id)
+      totalPayerDebits[payer] === undefined ?
+        totalPayerDebits[payer] = { payer, balanceId, points: subBalance}
+        : totalPayerDebits[payer].points = totalPayerDebits[payer].points + subBalance;
       i += 1;
     }
-    return [processedTransactions, updatedSubBalances, totalDebitsPerPayer];
+    return [totalPayerDebits, processedSubBalances];
   } catch(err) {
     console.error(err);
     return err;
@@ -40,16 +40,16 @@ const distributeDebit = async (subBalances, points) => {
 
 }
 
-const formatDistDebitData = async (totalDebitsPerPayer) => {
+const formatDebitData = async (totalPayerDebits) => {
   try {
     const debitSummaryPerPayer = [];
-    const balanceUpdatePerPayer = []
-    for (let payerDebitTotal in totalDebitsPerPayer) {
-      const { payer, balanceId, points } = totalDebitsPerPayer[payerDebitTotal]
+    const payerBalanceUpdates = []
+    for (let payerDebitTotal in totalPayerDebits) {
+      const { payer, balanceId, points } = totalPayerDebits[payerDebitTotal]
       debitSummaryPerPayer.push({ payer, points });
-      balanceUpdatePerPayer.push(points, balanceId)
+      payerBalanceUpdates.push(points, balanceId)
     }
-    return [debitSummaryPerPayer, balanceUpdatePerPayer];
+    return [debitSummaryPerPayer, payerBalanceUpdates];
   } catch(err) {
     console.error(err);
     return err;
@@ -58,11 +58,13 @@ const formatDistDebitData = async (totalDebitsPerPayer) => {
 
 const processSpendPoints = async (points) => {
   try {
-    const positiveSubBalances = await getPositiveSubBalances();
-    const [processedTrans, updatedSubBalances, totalDebitsPerpayer] = await distributeDebit(positiveSubBalances, points);
-    const [debitSummaryPerPayer, balanceUpdatePerPayer] = await formatDistDebitData(totalDebitsPerpayer)
-    await updatePayerBalances(balanceUpdatePerPayer, 'debit')
-    await updateAndInsertTransactions(updatedSubBalances, processedTrans)
+    //grab all transactions in order by timestamp a
+    const allTransactionsWithNonZero = await getAllNonZeroSubBalanceTransactions();
+    const [totalPayerDebits, processedSubBalances] = await distributeDebit();
+    const [debitSummaryPerPayer, payerBalanceUpdates] = await formatDebitData(totalPayerDebits);
+    //subtract totalPayerDebit from payer Balance
+    await updateTransactionsAndBalances(payerBalanceUpdates, processedSubBalances)
+    //update transactions with subbalances in processedSubBalances
     return debitSummaryPerPayer;
   } catch (err) {
     console.error(err);
@@ -70,4 +72,4 @@ const processSpendPoints = async (points) => {
   }
 }
 
-module.exports = { processSpendPoints, adminDebitAccount };
+module.exports = { processSpendPoints, addDebitTransaction };

@@ -1,38 +1,19 @@
 
-const transactionQueries = require('./queries/transactions')
+const queries = require('./queries')
 const connection = require('../db')
 
-const getAllTransactions = async () => {
-  const q = transactionQueries.getAllTransactions;
-  const result = await connection.query(q);
-  return result[0];
-}
-
-const getPositiveSubBalances = async  () => {
-  const q = transactionQueries.getPositiveSubBalances;
-  const result = await connection.query(q);
-  return result[0];
-}
-
-const addNewTransaction = async  (transaction) => {
-  const q = transactionQueries.addNewTransaction;
-  const v = transaction;
-  const result = await connection.query(q, v);
-  return result[0];
-}
-
-const updateAndInsertTransactions = async  (update, insert) => {
-  const q = await transactionQueries.buildUpdateAndInsertMultiQuery(update, insert);
-  //update is an array of [transactionId, newBalance, ...]
-  //insert is an array of [payer, balanceTrend,'debit', ...]
-  const v = update.concat(insert);
-  const result = await connection.query(q, v);
-  return result[0];
+const addNewTransaction = async  (transaction, processedSubBalances) => {
+  try {
+    const q = queries.addNewTransaction;
+    const v = transaction;
+    const result = await connection.query(q, v);
+    return result[0];
+  } catch (err) {
+    console.error(err)
+    return err;
+  }
 }
 
 module.exports = {
-  getAllTransactions,
-  getPositiveSubBalances,
   addNewTransaction,
-  updateAndInsertTransactions
 };

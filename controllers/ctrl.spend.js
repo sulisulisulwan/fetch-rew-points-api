@@ -1,5 +1,4 @@
 const  { getPositiveSubBalances, updateAndInsertTransactions } = require('../models').TransactionsModel;
-const  { updatePayerBalances } = require('../models').BalancesModel;
 const { processSpendPoints } = require('./subroutines/sr.debit')
 const spendPoints = async (req, res) => {
   try {
@@ -7,6 +6,7 @@ const spendPoints = async (req, res) => {
     const debitSummaryPerPayer = await processSpendPoints(points)
     res.status(201).json(debitSummaryPerPayer);
   } catch(err) {
+    console.error(err)
     res.sendStatus(500);
   }
 }
