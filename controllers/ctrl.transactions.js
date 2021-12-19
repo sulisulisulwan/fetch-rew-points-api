@@ -1,25 +1,26 @@
-const { addCreditTransaction } = require('./subroutines/sr.credit')
-const { addDebitTransaction } = require('./subroutines/sr.debit')
-const { Utils } = require('./utils')
-const utils = new Utils();
-
 const Controller = require('./baseClass')
 
 module.exports = class TransactionsControllers extends Controller {
 
-  constructor(models) {
+  constructor(models, utils, subroutines) {
     super(models);
+    this.utils = utils
+    this.sbrt = subroutines
   }
 
   async processTransactions (req, res) {
+
+    { CreditSbrt, DebitSbrt } = this.sbrt;
+    const Transactions = this.models;
+
     try {
       const { payer, points } = req.body;
-      const timestamp = await utils.formatTimestamp(req.body.timestamp)
-      let payerRecord = await getPayerByName(payer)
-      const payerId = payerRecord.length === 0 ? await addNewPayer(payer) : payerRecord[0].id;
+      const timestamp = await this.utils.formatTimestamp(req.body.timestamp)
+      let payerRecord = await Transactions.getPayerByName(payer)
+      const payerId = payerRecord.length === 0 ? await Transactions.addNewPayer(payer) : payerRecord[0].id;
       let transactionData = { payer, points, timestamp, payerId };
-      points < 0 ? await addDebitTransaction(transactionData)
-        : await addCreditTransaction(transactionData);
+      points < 0 ? await DebitSbrt.addDebitTransaction(transactionData)
+        : await CreditSbrt.addCreditTransaction(transactionData);
         res.sendStatus(201);
     } catch(err) {
       console.error(err)
