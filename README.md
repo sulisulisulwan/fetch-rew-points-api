@@ -2,7 +2,23 @@
 
 
 
-This microservice was built using Node.JS, Express.JS, MySQL 8.0.25,
+### This microservice was built using:
+
+- Node.JS,
+- Express.JS,
+- MySQL 8.0.25,
+
+## Contents
+
+1. [Dependencies](#dependencies)
+2. [Set up the database](#set-up-the-database)
+3. [Set up the environment variables](#set-up-the-environment-variables)
+4. [Run the server](#run-the-server)
+5. [The Endpoints](#the-endpoints)
+    - [Transactions](#transactions)
+    - [Spend](#spend)
+    - [Balance](#balance)
+
 
 # Dependencies
 
@@ -125,7 +141,6 @@ Upon successful request, `/balances` provides up to date data on the client's po
 `
 
 >There is no query payload rnecessary to receive a response from this endpoint.  However, if there were no previous transactions made in the database, hitting this endpoint will return an empty object.
-
 
 
 

@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const { TransactionsController } = require('../controllers')
-const { processTransactions } = TransactionsController;
+const { TransactionsCtrls } = require('../init')
+const { processTransactions } = TransactionsCtrls;
 
 router.post('/', processTransactions)
 

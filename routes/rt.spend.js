@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const { SpendController } = require('../controllers')
-const { spendPoints } = SpendController;
+const { SpendCtrls } = require('../init');
+const { spendPoints } = SpendCtrls;
 
 router.post('/', spendPoints)
 

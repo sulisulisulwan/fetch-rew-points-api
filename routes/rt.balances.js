@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const { BalanceController } = require('../controllers')
-const { getBalance } = BalanceController;
+const { BalancesCtrls } = require('../init')
+const { getBalance } = BalancesCtrls;
 
 router.get('/', getBalance)
 

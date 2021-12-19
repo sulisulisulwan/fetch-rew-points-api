@@ -1,18 +1,26 @@
-const { getAllBalances } = require('../models').BalancesModel
+const Controller = require('./baseClass')
 
-const getBalance = async (req, res) => {
-    try {
-      const result = await getAllBalances();
-      const balances = {}
-      result.forEach((balanceData) => {
-        const { payer, balance } = balanceData
-        balances[payer] = balance;
-      })
-      res.status(200).json(balances);
-    } catch(err) {
-      console.error(err);
-      res.sendStatus(500);
-    }
+module.exports = class BalancesControllers extends Controller {
+
+  constructor(models) {
+    super(models)
   }
 
-module.exports = { getBalance };
+  async getBalance(req, res) {
+      try {
+        const result = await getAllBalances();
+        const balances = {}
+        result.forEach((balanceData) => {
+          const { payer, balance } = balanceData
+          balances[payer] = balance;
+        })
+        res.status(200).json(balances);
+      } catch(err) {
+        console.error(err);
+        res.sendStatus(500);
+      }
+    }
+
+}
+
+

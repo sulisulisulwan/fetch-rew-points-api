@@ -1,27 +1,17 @@
+class Utils {
 
-
-const formatTimestamp = async (timestamp) => {
-  try {
-    let date = timestamp.substring(0, 10)
-    let time = timestamp.substring(11, 19)
+  async formatTimestamp (timestamp) {
+    if (typeof timestamp !== 'string') {
+      throw TypeError('First argument must be a string');
+    }
+    const parsedDate = new Date(Date.parse(timestamp)).toISOString();
+    let date = parsedDate.substring(0, 10)
+    let time = parsedDate.substring(11, 19)
     return `${date} ${time}`;
-  } catch(err) {
-    console.error(err);
-    return err;
-  }
-}
 
-const getTimestampForNow = async () => {
-  try {
-    let date = new Date(Date.now()).toISOString();
-    return date;
-  } catch(err) {
-    console.error(err);
-    return err;
   }
 }
 
 module.exports = {
-  formatTimestamp,
-  getTimestampForNow
+  Utils
 }

@@ -1,4 +1,3 @@
-const { addNewTransaction} = require('../../models').TransactionsModel
 const addCreditTransaction = async (transactionData) => {
   try {
     let { payer, points, timestamp, payerId, payerRecord } = transactionData;
