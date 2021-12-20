@@ -10,17 +10,16 @@ module.exports = class TransactionsControllers extends Controller {
 
   async processTransactions (req, res) {
 
-    { CreditSbrt, DebitSbrt } = this.sbrt;
-    const Transactions = this.models;
-
+    const { formatTimestamp } = this.utils;
+    const { getPayerByName, addNewPayer } = this.models;
     try {
       const { payer, points } = req.body;
-      const timestamp = await this.utils.formatTimestamp(req.body.timestamp)
-      let payerRecord = await Transactions.getPayerByName(payer)
-      const payerId = payerRecord.length === 0 ? await Transactions.addNewPayer(payer) : payerRecord[0].id;
+      const timestamp = await formatTimestamp(req.body.timestamp)
+      let payerRecord = await this.models.getPayerByName(payer)
+      const payerId = payerRecord[0].length === 0 ? (await this.models.addNewPayer(payer))[0].insertId : payerRecord[0].id;
       let transactionData = { payer, points, timestamp, payerId };
-      points < 0 ? await DebitSbrt.addDebitTransaction(transactionData)
-        : await CreditSbrt.addCreditTransaction(transactionData);
+      points < 0 ? await this.sbrt.DebitSbrt.addDebitTransaction(transactionData)
+        : await this.sbrt.CreditSbrt.addCreditTransaction(transactionData);
         res.sendStatus(201);
     } catch(err) {
       console.error(err)

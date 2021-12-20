@@ -13,7 +13,7 @@ module.exports = class BalancesControllers extends Controller {
     try {
       const result = await Balances.getAllBalances();
       const balances = {}
-      result.forEach((balanceData) => {
+      result[0].forEach((balanceData) => {
         const { payer, balance } = balanceData
         balances[payer] = balance;
       })

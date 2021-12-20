@@ -1,8 +1,10 @@
 const router = require('express').Router();
 const { SpendCtrls } = require('../init');
-const { spendPoints } = SpendCtrls;
 
-router.post('/', spendPoints)
+
+router.post('/', async(req, res) => {
+  await SpendCtrls.spendPoints(req, res)
+})
 
 module.exports = router;
 

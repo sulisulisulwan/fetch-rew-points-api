@@ -1,5 +1,3 @@
-const queries = require('./queries');
-const connection = require('../db')
 const Model = require('./baseClass')
 
 module.exports = class SpendModels extends Model {
@@ -9,28 +7,19 @@ module.exports = class SpendModels extends Model {
   }
 
   async updateTransactionsSubBalances(processedSubBalances) {
-    try {
-      const numOfStatements = processedSubBalances.length / 2;
-      const statement = `UPDATE Transactions SET subBalance = ? WHERE id = ?; `;
-      const queryStringsAndFrequency = [statement, numOfStatements]
-      const q = await queries.buildMultiStatementQuery(queryStringsAndFrequency)
-      const result = await connection.query(q, processedSubBalances)
-      return result[0];
-    } catch(err) {
-      console.error(err);
-      return err;
-    }
+    const numOfStatements = processedSubBalances.length / 2;
+    const statement = this.queries.updateTransactionsSubBalances;
+    const queryStringsAndFrequency = [statement, numOfStatements]
+    const q = await this.buildMultiStatementQuery(queryStringsAndFrequency)
+    const result = await this.connection.query(q, processedSubBalances)
+    return result;
+
   }
 
   async getAllNonZeroSubBalanceTransactions() {
-    try {
-      const q = queries.getAllNonZeroSubBalancedTransactions;
-      const result = await connection.query(q);
-      return result[0];
-    } catch(err) {
-      console.error(err);
-      return err;
-    }
+    const q = this.queries.getAllNonZeroSubBalancedTransactions;
+    const result = await this.connection.query(q);
+    return result;
   }
 
 }

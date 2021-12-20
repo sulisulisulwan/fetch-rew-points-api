@@ -8,12 +8,9 @@ module.exports = class SpendControllers extends Controller {
   }
 
   async spendPoints(req, res) {
-
-    { DebitSbrt } = this.sbrt;
-
     try {
       const { points } = req.body;
-      const debitSummaryPerPayer = await DebitSbrt.processSpendPoints(points)
+      const debitSummaryPerPayer = await this.sbrt.processSpendPoints(points)
       res.status(201).json(debitSummaryPerPayer);
     } catch(err) {
       console.error(err)
